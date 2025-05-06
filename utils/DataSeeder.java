@@ -8,9 +8,9 @@ public class DataSeeder {
 
     public static void seedData(UserRepository userRepo, ResourceRepository resourceRepo) {
         // Add default users
-        userRepo.addUser(new Admin("admin", "adminpass"));
-        userRepo.addUser(new ResourceManager("manager", "managerpass"));
-        userRepo.addUser(new RegularUser("user1", "user1pass"));
+        userRepo.addUser(new Admin("admin", "admin"));
+        userRepo.addUser(new ResourceManager("manager", "manager"));
+        userRepo.addUser(new RegularUser("user", "user"));
 
         // Add some resources
         resourceRepo.addResource(new Resource("Piano", "Musical Instrument", 50.0));

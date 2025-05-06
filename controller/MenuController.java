@@ -180,7 +180,6 @@ public class MenuController {
                 reportService.generateReport(bookingService.getAllBookings());
                 break;
             case 3:
-                // Logout
                 System.out.println("Logging out...");
                 currentUser = null;
                 return;
@@ -269,6 +268,7 @@ public class MenuController {
                 break;
 
             case 2:
+
                 System.out.println("=== Book a Resource ===");
                 displayResourceList(resourceService.getAllResources());
 
@@ -279,7 +279,7 @@ public class MenuController {
                         int value = scanner.nextInt();
                         resourceId = value;
                         break;
-                    } catch (Exception e) {
+                     }  catch (Exception e) {
                         System.out.println("Please enter a valid number.");
                         scanner.nextLine(); 
                     }
@@ -301,12 +301,16 @@ public class MenuController {
                     System.out.println("Enter end time:");
                     String endDate = scanner.nextLine();
 
+
+
                     try {
+
                         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
                         LocalDateTime start = LocalDateTime.parse(startDate, formatter);
                         LocalDateTime end = LocalDateTime.parse(endDate, formatter);
 
                         if (end.isBefore(start) || end.isEqual(start)) {
+
                             System.out.println("End time must be after start time.");
                             return;
                         }
@@ -338,9 +342,7 @@ public class MenuController {
                     System.out.println("You have no bookings.");
                 }
                 break;
-
             case 4:
-                // Logout
                 System.out.println("Logging out...");
                 currentUser = null;
                 return;
