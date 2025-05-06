@@ -11,7 +11,7 @@ public class Main {
         ResourceRepository resourceRepo = new ResourceRepository();
         BookingRepository bookingRepo = new BookingRepository();
 
-        // Seed initial data
+       
         DataSeeder.seedData(userRepo, resourceRepo);
 
         UserService userService = new UserService(userRepo);
@@ -21,7 +21,6 @@ public class Main {
 
         MenuController menuController = new MenuController(userService, resourceService, bookingService, reportService);
 
-        // Start the system
         menuController.start();
     }
 }
