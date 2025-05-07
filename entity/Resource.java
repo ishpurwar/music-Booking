@@ -6,7 +6,7 @@ public class Resource {
     private String name;
     private String type;
     private double costPerHour;
-    
+
 
     public Resource(String name, String type, double costPerHour) {
         this.id = idCounter++;
