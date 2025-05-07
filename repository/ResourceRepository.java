@@ -22,4 +22,12 @@ public class ResourceRepository {
         }
         return null;
     }
+    public Resource findSimilarResource(String name, String type) {
+        for (Resource r : resources) {
+            if (r.getName().equalsIgnoreCase(name) && r.getType().equalsIgnoreCase(type)) {
+                return r;
+            }
+        }
+        return null;
+    }
 }

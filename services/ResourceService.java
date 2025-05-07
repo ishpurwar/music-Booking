@@ -12,9 +12,20 @@ public class ResourceService {
         this.repo = repo;
     }
 
-    public void addResource(String name, String type, double costPerHour) {
-        Resource resource = new Resource(name, type, costPerHour);
-        repo.addResource(resource);
+    public boolean addResource(String name, String type, double costPerHour, int quantity) {
+        // Check if a similar resource exists
+        Resource existingResource = repo.findSimilarResource(name, type);
+        
+        if (existingResource != null) {
+            // Increment quantity of existing resource
+            existingResource.incrementQuantity(quantity);
+            return false; // Return false to indicate no new resource was created
+        } else {
+            // Create new resource
+            Resource resource = new Resource(name, type, costPerHour, quantity);
+            repo.addResource(resource);
+            return true; // Return true to indicate a new resource was created
+        }
     }
 
     public List<Resource> getAllResources() {

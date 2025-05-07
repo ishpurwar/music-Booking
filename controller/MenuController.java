@@ -15,6 +15,7 @@ public class MenuController {
     private ReportService reportService;
     private User currentUser;
     Scanner scanner = new Scanner(System.in);
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
     public MenuController(UserService userService, ResourceService resourceService, BookingService bookingService,
             ReportService reportService) {
@@ -25,27 +26,14 @@ public class MenuController {
     }
 
     public void start() {
-
         while (true) {
-
             System.out.println("=== Music Booking System ===");
             System.out.println("1. Login");
             System.out.println("2. Register");
             System.out.println("3. Exit");
 
-            int choice = -1;
-            while (true) {
-                try {
-                    System.out.print("Choose an option: ");
-                    int value = scanner.nextInt();
-                    choice = value;
-                    break;
-                } catch (Exception e) {
-                    System.out.println("Please enter a valid number.");
-                    scanner.nextLine(); 
-                }
-            }
-            scanner.nextLine(); 
+            int choice = getValidIntInput("Choose an option: ");
+            scanner.nextLine(); // Clear buffer
 
             switch (choice) {
                 case 1:
@@ -59,14 +47,41 @@ public class MenuController {
                     return;
                 default:
                     System.out.println("Invalid choice. Please try again.");
-                    System.out.print("\nPress Enter to continue...");
-                    scanner.nextLine();
+                    waitForEnter();
             }
         }
     }
 
-    private void login() {
+    private int getValidIntInput(String prompt) {
+        while (true) {
+            try {
+                System.out.print(prompt);
+                return scanner.nextInt();
+            } catch (Exception e) {
+                System.out.println("Please enter a valid number.");
+                scanner.nextLine();
+            }
+        }
+    }
 
+    private double getValidDoubleInput(String prompt) {
+        while (true) {
+            try {
+                System.out.print(prompt);
+                return scanner.nextDouble();
+            } catch (Exception e) {
+                System.out.println("Please enter a valid number.");
+                scanner.nextLine();
+            }
+        }
+    }
+
+    private void waitForEnter() {
+        System.out.print("\nPress Enter to continue...");
+        scanner.nextLine();
+    }
+
+    private void login() {
         System.out.println("=== Login ===");
         System.out.println("Enter Username:");
         String username = scanner.nextLine();
@@ -76,8 +91,7 @@ public class MenuController {
         currentUser = userService.login(username, password);
         if (currentUser == null) {
             System.out.println("Invalid username or password.");
-            System.out.print("\nPress Enter to continue...");
-            scanner.nextLine();
+            waitForEnter();
             return;
         }
 
@@ -85,7 +99,6 @@ public class MenuController {
     }
 
     private void register() {
-
         System.out.println("=== Register ===");
         System.out.println("Enter Username:");
         String username = scanner.nextLine();
@@ -93,25 +106,14 @@ public class MenuController {
         String password = scanner.nextLine();
         if (password.length() < 8 || !password.matches(".*[a-zA-Z].*") || !password.matches(".*\\d.*")) {
             System.out.println("Password must be at least 8 characters long and contain a mix of letters and numbers.");
+            waitForEnter();
             return;
         }
         System.out.println("Select Role:");
         System.out.println("1. Regular User");
         System.out.println("2. Resource Manager");
 
-        int roleChoice = -1;
-        while (true) {
-            try {
-                System.out.print("Choose role:");
-                int value = scanner.nextInt();
-                roleChoice = value;
-                break;
-            } catch (Exception e) {
-                System.out.println("Please enter a valid number.");
-                scanner.nextLine();
-            }
-        }
-
+        int roleChoice = getValidIntInput("Choose role: ");
         scanner.nextLine();
 
         String role = "REGULAR_USER";
@@ -125,28 +127,16 @@ public class MenuController {
         } else {
             System.out.println("Username already exists. Please try again.");
         }
-        System.out.print("\nPress Enter to continue...");
-        scanner.nextLine();
+        waitForEnter();
     }
 
     private void handleUserSession() {
         while (currentUser != null) {
-            System.out.println("Welcome, " + currentUser.getUsername() + "!");
+            System.out.println("\nWelcome, " + currentUser.getUsername() + "!");
             System.out.println();
 
             currentUser.displayMenu();
-            int choice = -1;
-            while (true) {
-                try {
-                    System.out.print("Choose an option: ");
-                    int value = scanner.nextInt();
-                    choice = value;
-                    break;
-                } catch (Exception e) {
-                    System.out.println("Please enter a valid number.");
-                    scanner.nextLine(); 
-                }
-            }
+            int choice = getValidIntInput("Choose an option: ");
             scanner.nextLine();
 
             switch (currentUser.getRole()) {
@@ -163,8 +153,7 @@ public class MenuController {
 
             // Pause after each action unless user logged out
             if (currentUser != null) {
-                System.out.print("\nPress Enter to continue...");
-                scanner.nextLine();
+                waitForEnter();
             }
         }
     }
@@ -173,7 +162,14 @@ public class MenuController {
         switch (choice) {
             case 1:
                 System.out.println("=== All Bookings ===");
-                reportService.printBookingStats(bookingService.getAllBookings());
+                List<Booking> allBookings = bookingService.getAllBookings();
+                if (allBookings.isEmpty()) {
+                    System.out.println("No bookings found.");
+                } else {
+                    for (Booking booking : allBookings) {
+                        System.out.println(booking);
+                    }
+                }
                 break;
             case 2:
                 System.out.println("=== Reports ===");
@@ -200,19 +196,8 @@ public class MenuController {
                 System.out.println("1. Musical Instrument");
                 System.out.println("2. Studio Room");
                 System.out.println("3. Audio Equipment");
-                int typeChoice = -1;
-                while (true) {
-                    try {
-                        System.out.print("Select type (1-3): ");
-                        int value = scanner.nextInt();
-                        typeChoice = value;
-                        break;
-                    } catch (Exception e) {
-                        System.out.println("Please enter a valid number.");
-                        scanner.nextLine(); 
-                    }
-                }
-               scanner.nextLine();
+                int typeChoice = getValidIntInput("Select type (1-3): ");
+                scanner.nextLine();
 
                 String type;
                 switch (typeChoice) {
@@ -229,20 +214,16 @@ public class MenuController {
                         type = "Other";
                 }
 
-                double costPerHour = -1;
-                while (true) {
-                    try {
-                        System.out.print("Enter Cost per Hour ($): ");
-                        double value = scanner.nextDouble();
-                        costPerHour = value;
-                        break;
-                    } catch (Exception e) {
-                        System.out.println("Please enter a valid number.");
-                        scanner.nextLine(); 
-                    }
+                double costPerHour = getValidDoubleInput("Enter Cost per Hour ($): ");
+                int quantity = getValidIntInput("Enter Quantity: ");
+                scanner.nextLine();
+
+                boolean isNewResource = resourceService.addResource(name, type, costPerHour, quantity);
+                if (isNewResource) {
+                    System.out.println("New resource added successfully!");
+                } else {
+                    System.out.println("Resource already exists. Quantity has been updated!");
                 }
-                resourceService.addResource(name, type, costPerHour);
-                System.out.println("Resource added successfully!");
                 break;
 
             case 2:
@@ -265,77 +246,97 @@ public class MenuController {
         switch (choice) {
             case 1:
                 System.out.println("=== Available Resources ===");
-                displayResourceList(resourceService.getAllResources());
+                viewResourceList(resourceService.getAllResources());
                 break;
 
             case 2:
                 System.out.println("=== Book a Resource ===");
-                displayResourceList(resourceService.getAllResources());
 
-                int resourceId =-1;
-                while (true) {
-                    try {
-                        System.out.print("Enter Resource ID to book (0 to cancel): ");
-                        int value = scanner.nextInt();
-                        resourceId = value;
-                        break;
-                    } catch (Exception e) {
-                        System.out.println("Please enter a valid number.");
-                        scanner.nextLine(); 
+                // First, get the time range for booking
+                System.out.println("\nEnter dates in format: yyyy-MM-dd HH:mm (e.g. 2025-05-06 14:30)");
+                System.out.println("Enter start time:");
+                String startDate = scanner.nextLine();
+                System.out.println("Enter end time:");
+                String endDate = scanner.nextLine();
+
+                try {
+                    LocalDateTime start = LocalDateTime.parse(startDate, formatter);
+                    LocalDateTime end = LocalDateTime.parse(endDate, formatter);
+
+                    if (end.isBefore(start) || end.isEqual(start)) {
+                        System.out.println("End time must be after start time.");
+                        return;
                     }
-                }
-                scanner.nextLine();
 
-                if (resourceId == 0) {
-                    System.out.println("Booking canceled.");
-                    return;
-                }
+                    DateTimeRange range = new DateTimeRange(start, end);
 
-                Resource resource = resourceService.getById(resourceId);
-                if (resource != null) {
-                    System.out.println("Selected: " + resource.getName() + " - $" + resource.getCostPerHour() + "/hr");
+                    // Get resources available during that time
+                    List<Resource> availableResources = bookingService.getAvailableResources(
+                            resourceService.getAllResources(), range);
 
-                    System.out.println("\nEnter dates in format: yyyy-MM-dd HH:mm (e.g. 2025-05-06 14:30)");
-                    System.out.println("Enter start time:");
-                    String startDate = scanner.nextLine();
-                    System.out.println("Enter end time:");
-                    String endDate = scanner.nextLine();
+                    // Display available resources
+                    System.out.println("=== Available Resources for Selected Time ===");
+                    if (availableResources.isEmpty()) {
+                        System.out.println("No resources available for the selected time period.");
+                        return;
+                    }
 
-                    try {
-                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-                        LocalDateTime start = LocalDateTime.parse(startDate, formatter);
-                        LocalDateTime end = LocalDateTime.parse(endDate, formatter);
+                    displayResourceList(availableResources);
 
-                        if (end.isBefore(start) || end.isEqual(start)) {
-                            System.out.println("End time must be after start time.");
+                    int resourceId = getValidIntInput("Enter Resource ID to book (0 to cancel): ");
+                    scanner.nextLine();
+
+                    if (resourceId == 0) {
+                        System.out.println("Booking canceled.");
+                        return;
+                    }
+
+                    Resource resource = resourceService.getById(resourceId);
+                    if (resource != null) {
+                        System.out.println(
+                                "Selected: " + resource.getName() + " - $" + resource.getCostPerHour() + "/hr");
+
+                        // Get resource availability during selected time
+                        List<Resource> available = bookingService.getAvailableResources(List.of(resource), range);
+                        if (available.isEmpty()) {
+                            System.out.println("This resource is no longer available for the selected time.");
                             return;
                         }
 
-                        DateTimeRange range = new DateTimeRange(start, end);
-                        if (bookingService.book(currentUser, resource, range)) {
-                            System.out.println("Booking successful!");
-                        } else {
-                            System.out.println("Time slot is already booked or unavailable.");
+                        int maxAvailable = available.get(0).getAvailableQuantity();
+                        System.out.println("Available quantity: " + maxAvailable);
+
+                        int bookQuantity = getValidIntInput("Enter quantity to book (max " + maxAvailable + "): ");
+                        scanner.nextLine();
+
+                        if (bookQuantity <= 0 || bookQuantity > maxAvailable) {
+                            System.out.println("Invalid quantity. Booking canceled.");
+                            return;
                         }
-                    } catch (Exception e) {
-                        System.out.println("Invalid date format. Please try again.");
+
+                        if (bookingService.book(currentUser, resource, range, bookQuantity)) {
+                            double cost = Calculator.calculateCost(resource, range, bookQuantity);
+                            System.out.printf("Booking successful! Total cost: $%.2f\n", cost);
+                        } else {
+                            System.out.println("Booking failed. The resource might no longer be available.");
+                        }
+                    } else {
+                        System.out.println("Resource not found.");
                     }
-                } else {
-                    System.out.println("Resource not found.");
+                } catch (Exception e) {
+                    System.out.println("Invalid date format or input. Please try again. Error: " + e.getMessage());
                 }
                 break;
 
             case 3:
                 System.out.println("=== My Bookings ===");
-                boolean found = false;
-                for (Booking booking : bookingService.getAllBookings()) {
-                    if (booking.getUser().getUsername().equals(currentUser.getUsername())) {
-                        System.out.println(booking);
-                        found = true;
-                    }
-                }
-                if (!found) {
+                List<Booking> userBookings = bookingService.getUserBookings(currentUser);
+                if (userBookings.isEmpty()) {
                     System.out.println("You have no bookings.");
+                } else {
+                    for (Booking booking : userBookings) {
+                        System.out.println(booking);
+                    }
                 }
                 break;
 
@@ -354,11 +355,28 @@ public class MenuController {
         if (resources.isEmpty()) {
             System.out.println("No resources available.");
         } else {
-            System.out.println("ID | Name | Type | Cost/Hour");
-            System.out.println("----------------------------");
+            System.out.println("ID | Name | Type | Cost/Hour | Available/Total");
+            System.out.println("------------------------------------------");
             for (Resource r : resources) {
-                System.out.printf("%d | %s | %s | $%.2f\n",
-                        r.getId(), r.getName(), r.getType(), r.getCostPerHour());
+                System.out.printf("%d | %s | %s | $%.2f | %d/%d\n",
+                        r.getId(), r.getName(), r.getType(), r.getCostPerHour(),
+                        r.getAvailableQuantity(), r.getQuantity());
+            }
+            System.out.println();
+        }
+    }
+
+    private void viewResourceList(List<Resource> resources) {
+        if (resources.isEmpty()) {
+            System.out.println("No resources available.");
+        } else {
+            System.out.println("ID | Name | Type | Cost/Hour ");
+            System.out.println("------------------------------------------");
+            for (Resource r : resources) {
+                System.out.println(r.getId() + " | " + r.getName() + " | " + r.getType()
+                        + " | " + r.getCostPerHour()
+
+                );
             }
             System.out.println();
         }

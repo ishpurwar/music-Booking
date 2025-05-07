@@ -1,10 +1,12 @@
 package entity;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class DateTimeRange {
     private LocalDateTime start;
     private LocalDateTime end;
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
     public DateTimeRange(LocalDateTime start, LocalDateTime end) {
         this.start = start;
@@ -21,7 +23,7 @@ public class DateTimeRange {
 
     @Override
     public String toString() {
-        return start + " to " + end;
+        return start.format(formatter) + " to " + end.format(formatter);
     }
 
     public LocalDateTime getStart() { return start; }

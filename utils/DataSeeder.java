@@ -13,8 +13,8 @@ public class DataSeeder {
         userRepo.addUser(new RegularUser("user1", "user1pass"));
 
         // Add some resources
-        resourceRepo.addResource(new Resource("Piano", "Musical Instrument", 50.0));
-        resourceRepo.addResource(new Resource("Guitar", "Musical Instrument", 30.0));
-        resourceRepo.addResource(new Resource("Drum Kit", "Musical Instrument", 40.0));
+        resourceRepo.addResource(new Resource("Piano", "Musical Instrument", 50.0,2));
+        resourceRepo.addResource(new Resource("Guitar", "Musical Instrument", 30.0,2));
+        resourceRepo.addResource(new Resource("Drum Kit", "Musical Instrument", 40.0,3));
     }
 }
