@@ -1,2 +1,12 @@
-/music-Booking.iml
-/.idea
+# Ignore IntelliJ IDEA project files
+*.iml
+.idea/
+
+# Optional: Ignore build and dependency directories (commonly used in Java projects)
+out/
+target/
+build/
+
+# Optional: Ignore OS-specific files
+.DS_Store
+Thumbs.db
