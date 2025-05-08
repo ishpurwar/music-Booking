@@ -212,7 +212,7 @@ public class MenuController {
                     System.out.println("Resource name cannot be empty.");
                     return;
                 }
-                if (!name.matches("[a-zA-Z]+")) {
+                if (!name.matches("[a-zA-Z]+")) { //AlphaNumeric Only 
                     System.out.println("Resource name can only contain alphabetic characters.");
                     return;
                 }
