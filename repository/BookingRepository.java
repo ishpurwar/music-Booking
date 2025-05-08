@@ -17,22 +17,28 @@ public class BookingRepository {
         return bookings;
     }
      public List<Booking> getBookingsInRange(DateTimeRange range) {
-        List<Booking> result = new ArrayList<>();
+       /*  List<Booking> result = new ArrayList<>();
         for (Booking booking : bookings) {
             if (booking.getTimeRange().overlaps(range)) {
                 result.add(booking);
             }
         }
-        return result;
+        return result; */
+        return bookings.stream()
+                .filter(booking -> booking.getTimeRange().overlaps(range))
+                .toList();
     }
     
     public List<Booking> getBookingsForResource(int resourceId) {
-        List<Booking> result = new ArrayList<>();
+        /* List<Booking> result = new ArrayList<>();
         for (Booking booking : bookings) {
             if (booking.getResource().getId() == resourceId) {
                 result.add(booking);
             }
         }
-        return result;
+        return result; */
+        return bookings.stream()
+                .filter(booking -> booking.getResource().getId() == resourceId)
+                .toList();
     }
 }

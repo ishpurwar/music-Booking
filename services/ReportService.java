@@ -1,9 +1,6 @@
 package services;
 
 import entity.*;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,8 +38,6 @@ public class ReportService {
         if (bookings.isEmpty()) return;
         
         System.out.println("\n=== Detailed Report ===");
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        LocalDateTime now = LocalDateTime.now();
         
         // Bookings by user
         Map<String, Integer> bookingsByUser = new HashMap<>();
