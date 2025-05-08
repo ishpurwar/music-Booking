@@ -13,6 +13,7 @@ public class DataSeeder {
         userRepo.addUser(new RegularUser("ayush", "ayush"));
         userRepo.addUser(new RegularUser("ish", "ish"));
         userRepo.addUser(new RegularUser("animesh", "animesh"));
+        userRepo.addUser(new RegularUser("Tarun", "TSSpass"));
 
         // Add some resources
         resourceRepo.addResource(new Resource("Piano", "Musical Instrument", 50.0,2));
