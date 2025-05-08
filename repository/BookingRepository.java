@@ -41,4 +41,7 @@ public class BookingRepository {
                 .filter(booking -> booking.getResource().getId() == resourceId)
                 .toList();
     }
+    public boolean removeBooking(Booking booking) {
+        return bookings.remove(booking);
+    }
 }

@@ -103,22 +103,22 @@ public class MenuController {
         System.out.println("Enter Username:");
 
         String username = scanner.nextLine();
-    if (username.matches("\\d+")) {
-        System.out.println("Username cannot be a complete number.");
-        waitForEnter();
-        return;
-    }
-    if (!username.matches("[a-zA-Z0-9_]+")) {
-        System.out.println("Username can only contain letters, numbers, and underscores (_).");
-        waitForEnter();
-        return;
-    }
-    if (username.contains(" ")) {
-        System.out.println("Username cannot contain spaces.");
-        waitForEnter();
-        return;
-    }
-        System.out.println("");
+        if (username.matches("\\d+")) {
+            System.out.println("Username cannot be a complete number.");
+            waitForEnter();
+            return;
+        }
+        if (!username.matches("[a-zA-Z0-9_]+")) {
+            System.out.println("Username can only contain letters, numbers, and underscores (_).");
+            waitForEnter();
+            return;
+        }
+        if (username.contains(" ")) {
+            System.out.println("Username cannot contain spaces.");
+            waitForEnter();
+            return;
+        }
+        
         System.out.println("Enter Password:");
         String password = scanner.nextLine();
         if (password.length() < 8 || !password.matches(".*[a-zA-Z].*") || !password.matches(".*\\d.*")) {
@@ -245,7 +245,7 @@ public class MenuController {
                 }
 
                 int quantity = getValidIntInput("Enter Quantity: ");
-                if (quantity < 0) {
+                if (quantity <= 0) {
                     System.out.println("Quantity must be greater than zero.");
                     return;
                 }
@@ -263,8 +263,54 @@ public class MenuController {
                 System.out.println("=== Available Resources ===");
                 displayResourceList(resourceService.getAllResources());
                 break;
-
+                
             case 3:
+            System.out.println("=== Remove Resource Quantity ===");
+            displayResourceList(resourceService.getAllResources());
+            
+            int resourceId = getValidIntInput("Enter Resource ID to remove quantity (0 to cancel): ");
+            scanner.nextLine();
+            
+            if (resourceId == 0) {
+                System.out.println("Operation canceled.");
+                return;
+            }
+            
+            Resource resource = resourceService.getById(resourceId);
+            if (resource == null) {
+                System.out.println("Resource not found.");
+                return;
+            }
+            
+            // Calculate the maximum quantity that can be removed
+            int maxRemovable = resourceService.getMaxRemovableQuantity(resourceId);
+            
+            System.out.println("Selected: " + resource.getName() + " - Current quantity: " + resource.getQuantity());
+            System.out.println("Maximum quantity that can be removed: " + maxRemovable);
+            
+            if (maxRemovable == 0) {
+                System.out.println("All units are currently booked. Cannot remove any units at this time.");
+                return;
+            }
+            
+            int quantityToRemove = getValidIntInput("Enter quantity to remove (1-" + maxRemovable + "): ");
+            scanner.nextLine();
+            
+            if (quantityToRemove <= 0 || quantityToRemove > maxRemovable) {
+                System.out.println("Invalid quantity. Operation canceled.");
+                return;
+            }
+            
+            boolean removed = resourceService.removeResourceQuantity(resourceId, quantityToRemove);
+            if (removed) {
+                System.out.println("Successfully removed " + quantityToRemove + " units of " + resource.getName());
+            } else {
+                System.out.println("Failed to remove quantity. This may be because:");
+                System.out.println("The requested quantity exceeds the available amount");
+            }
+            break;
+
+            case 4:
                 // Logout
                 System.out.println("Logging out...");
                 currentUser = null;
@@ -367,13 +413,51 @@ public class MenuController {
                 if (userBookings.isEmpty()) {
                     System.out.println("You have no bookings.");
                 } else {
-                    for (Booking booking : userBookings) {
-                        System.out.println(booking);
+                    System.out.println("Index | Resource | Time Range | Cost");
+                    System.out.println("------------------------------------------");
+                    for (int i = 0; i < userBookings.size(); i++) {
+                        Booking booking = userBookings.get(i);
+                        System.out.printf("%d | %s | %s | $%.2f\n", 
+                            i, booking.getResource().getName(), 
+                            booking.getTimeRange(), booking.getTotalCost());
                     }
                 }
                 break;
-
+                
             case 4:
+                System.out.println("=== Cancel Booking ===");
+                List<Booking> bookings = bookingService.getUserBookings(currentUser);
+                if (bookings.isEmpty()) {
+                    System.out.println("You have no bookings to cancel.");
+                    return;
+                }
+                
+                System.out.println("Your current bookings:");
+                System.out.println("Index | Resource | Time Range | Cost");
+                System.out.println("------------------------------------------");
+                for (int i = 0; i < bookings.size(); i++) {
+                    Booking booking = bookings.get(i);
+                    System.out.printf("%d | %s | %s | $%.2f\n", 
+                        i, booking.getResource().getName(), 
+                        booking.getTimeRange(), booking.getTotalCost());
+                }
+                
+                int bookingIndex = getValidIntInput("Enter the index of the booking to cancel (or -1 to cancel operation): ");
+                scanner.nextLine();
+                
+                if (bookingIndex == -1) {
+                    System.out.println("Operation canceled.");
+                    return;
+                }
+                
+                if (bookingService.cancelBooking(currentUser, bookingIndex)) {
+                    System.out.println("Booking canceled successfully!");
+                } else {
+                    System.out.println("Failed to cancel booking. Please check the booking index.");
+                }
+                break;
+
+            case 5:
                 // Logout
                 System.out.println("Logging out...");
                 currentUser = null;
@@ -391,14 +475,20 @@ public class MenuController {
             System.out.println("ID | Name | Type | Cost/Hour | Available/Total");
             System.out.println("------------------------------------------");
             for (Resource r : resources) {
+                // Make sure available quantity is never displayed as negative
+                if (r.getQuantity()== 0) {
+                    continue; // Skip resources with zero quantity
+                    
+                }
+                int availableToDisplay = Math.max(0, r.getAvailableQuantity());
                 System.out.printf("%d | %s | %s | $%.2f | %d/%d\n",
                         r.getId(), r.getName(), r.getType(), r.getCostPerHour(),
-                        r.getAvailableQuantity(), r.getQuantity());
+                        availableToDisplay, r.getQuantity());
             }
             System.out.println();
         }
     }
-
+    
     private void viewResourceList(List<Resource> resources) {
         if (resources.isEmpty()) {
             System.out.println("No resources available.");
@@ -406,10 +496,12 @@ public class MenuController {
             System.out.println("ID | Name | Type | Cost/Hour ");
             System.out.println("------------------------------------------");
             for (Resource r : resources) {
-                System.out.println(r.getId() + " | " + r.getName() + " | " + r.getType()
-                        + " | " + r.getCostPerHour()
-
-                );
+                if (r.getQuantity()==0) {
+                    continue; // Skip resources with zero quantity
+                    
+                }
+                System.out.printf("%d | %s | %s | $%.2f\n",
+                        r.getId(), r.getName(), r.getType(), r.getCostPerHour());
             }
             System.out.println();
         }

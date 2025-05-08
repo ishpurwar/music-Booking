@@ -15,7 +15,7 @@ public class Main {
         DataSeeder.seedData(userRepo, resourceRepo);
 
         UserService userService = new UserService(userRepo);
-        ResourceService resourceService = new ResourceService(resourceRepo);
+        ResourceService resourceService = new ResourceService(resourceRepo, bookingRepo);
         BookingService bookingService = new BookingService(bookingRepo);
         ReportService reportService = new ReportService();
 

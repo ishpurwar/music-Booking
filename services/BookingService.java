@@ -73,4 +73,19 @@ public class BookingService {
         }
         return userBookings;
     }
+    public boolean cancelBooking(User user, int bookingIndex) {
+        List<Booking> userBookings = getUserBookings(user);
+        
+        // Check if booking index is valid
+        if (bookingIndex < 0 || bookingIndex >= userBookings.size()) {
+            return false;
+        }
+        
+        Booking bookingToCancel = userBookings.get(bookingIndex);
+        
+        // Remove the booking from repository
+        boolean removed = repo.removeBooking(bookingToCancel);
+        
+        return removed;
+    }
 }
