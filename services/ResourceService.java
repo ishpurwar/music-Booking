@@ -19,6 +19,7 @@ public class ResourceService {
         if (existingResource != null) {
             // Increment quantity of existing resource
             existingResource.incrementQuantity(quantity);
+            existingResource.setCostPerHour(costPerHour); 
             return false; // Return false to indicate no new resource was created
         } else {
             // Create new resource

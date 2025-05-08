@@ -38,7 +38,9 @@ public class Resource {
         this.quantity += amount;
         this.availableQuantity += amount;
     }
-
+    public void setCostPerHour(double costPerHour) {
+        this.costPerHour = costPerHour;
+    }
     @Override
     public String toString() {
         return id + ". " + name + " (" + type + ") - $" + costPerHour + "/hr";

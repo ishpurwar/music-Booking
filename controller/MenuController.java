@@ -101,7 +101,24 @@ public class MenuController {
     private void register() {
         System.out.println("=== Register ===");
         System.out.println("Enter Username:");
+
         String username = scanner.nextLine();
+    if (username.matches("\\d+")) {
+        System.out.println("Username cannot be a complete number.");
+        waitForEnter();
+        return;
+    }
+    if (!username.matches("[a-zA-Z0-9_]+")) {
+        System.out.println("Username can only contain letters, numbers, and underscores (_).");
+        waitForEnter();
+        return;
+    }
+    if (username.contains(" ")) {
+        System.out.println("Username cannot contain spaces.");
+        waitForEnter();
+        return;
+    }
+        System.out.println("");
         System.out.println("Enter Password:");
         String password = scanner.nextLine();
         if (password.length() < 8 || !password.matches(".*[a-zA-Z].*") || !password.matches(".*\\d.*")) {
@@ -191,7 +208,14 @@ public class MenuController {
                 System.out.println("=== Add New Resource ===");
                 System.out.println("Enter Resource Name:");
                 String name = scanner.nextLine();
-
+                if (name.isEmpty()) {
+                    System.out.println("Resource name cannot be empty.");
+                    return;
+                }
+                if (!name.matches("[a-zA-Z]+")) {
+                    System.out.println("Resource name can only contain alphabetic characters.");
+                    return;
+                }
                 System.out.println("Choose Resource Type:");
                 System.out.println("1. Musical Instrument");
                 System.out.println("2. Studio Room");
@@ -215,14 +239,23 @@ public class MenuController {
                 }
 
                 double costPerHour = getValidDoubleInput("Enter Cost per Hour ($): ");
+                if (costPerHour <= 0) {
+                    System.out.println("Cost must be greater than zero.");
+                    return;
+                }
+
                 int quantity = getValidIntInput("Enter Quantity: ");
+                if (quantity < 0) {
+                    System.out.println("Quantity must be greater than zero.");
+                    return;
+                }
                 scanner.nextLine();
 
                 boolean isNewResource = resourceService.addResource(name, type, costPerHour, quantity);
                 if (isNewResource) {
-                    System.out.println("New resource added successfully!");
+                    System.out.println("New resource added successfully! ");
                 } else {
-                    System.out.println("Resource already exists. Quantity has been updated!");
+                    System.out.println("Resource already exists. Quantity and Cost has been updated!");
                 }
                 break;
 
